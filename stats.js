@@ -37,6 +37,15 @@ config.configFile(process.argv[2], function (config, oldConfig) {
     }, config.debugInterval || 10000);
   }
 
+  var stat_suffix = ''
+  if (config.hostname && (config.append_hostname || false)) {
+      stat_suffix = '.' + config.hostname;
+      if (config.debug) {
+          util.log("Using hostname as suffix: " + stat_suffix)
+      }
+  }
+
+
   if (server === undefined) {
 
     // key counting
@@ -198,8 +207,8 @@ config.configFile(process.argv[2], function (config, oldConfig) {
         var value = counters[key];
         var valuePerSecond = value / (flushInterval / 1000); // calculate "per second" rate
 
-        statString += 'stats.'        + key + ' ' + valuePerSecond + ' ' + ts + "\n";
-        statString += 'stats_counts.' + key + ' ' + value          + ' ' + ts + "\n";
+        statString += 'stats.'        + key + stat_suffix + ' ' + valuePerSecond + ' ' + ts + "\n";
+        statString += 'stats_counts.' + key + stat_suffix + ' ' + value          + ' ' + ts + "\n";
 
         counters[key] = 0;
         numStats += 1;
@@ -238,15 +247,15 @@ config.configFile(process.argv[2], function (config, oldConfig) {
 
             var clean_pct = '' + pct;
             clean_pct.replace('.', '_');
-            message += 'stats.timers.' + key + '.mean_'  + clean_pct + ' ' + mean           + ' ' + ts + "\n";
-            message += 'stats.timers.' + key + '.upper_' + clean_pct + ' ' + maxAtThreshold + ' ' + ts + "\n";
+            message += 'stats.timers.' + key + stat_suffix + '.mean_'  + clean_pct + ' ' + mean           + ' ' + ts + "\n";
+            message += 'stats.timers.' + key + stat_suffix + '.upper_' + clean_pct + ' ' + maxAtThreshold + ' ' + ts + "\n";
           }
 
           timers[key] = [];
 
-          message += 'stats.timers.' + key + '.upper ' + max   + ' ' + ts + "\n";
-          message += 'stats.timers.' + key + '.lower ' + min   + ' ' + ts + "\n";
-          message += 'stats.timers.' + key + '.count ' + count + ' ' + ts + "\n";
+          message += 'stats.timers.' + key + stat_suffix + '.upper ' + max   + ' ' + ts + "\n";
+          message += 'stats.timers.' + key + stat_suffix + '.lower ' + min   + ' ' + ts + "\n";
+          message += 'stats.timers.' + key + stat_suffix + '.count ' + count + ' ' + ts + "\n";
           statString += message;
 
           numStats += 1;
@@ -254,11 +263,11 @@ config.configFile(process.argv[2], function (config, oldConfig) {
       }
 
       for (key in gauges) {
-        statString += 'stats.gauges.' + key + ' ' + gauges[key] + ' ' + ts + "\n";
+        statString += 'stats.gauges.' + key + stat_suffix + ' ' + gauges[key] + ' ' + ts + "\n";
         numStats += 1;
       }
 
-      statString += 'statsd.numStats ' + numStats + ' ' + ts + "\n";
+      statString += 'statsd.numStats' + stat_suffix + ' ' + numStats + ' ' + ts + "\n";
 
       if (config.graphiteHost) {
         try {

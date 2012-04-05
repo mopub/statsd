@@ -28,6 +28,10 @@ Optional Variables:
     interval:       how often to log frequent keys [ms, default: 0]
     percent:        percentage of frequent keys to log [%, default: 100]
     log:            location of log file for frequent keys [default: STDOUT]
+    hostname:       the hostname of the current machine
+                    (used in conjuction with 'append_hostname') [default: undefined]
+ append_hostname:   when true, statsd will append the hostname to _all_ stats' keys
+                    [default: false]
 
 */
 {
