@@ -8,31 +8,11 @@ namespace Statsd
     public class StatsdPipe : IDisposable
     {
         private readonly UdpClient udpClient;
-
-        [ThreadStatic]
-        private static Random random;
-
-        private static Random Random
-        {
-            get
-            {
-                return random ?? (random = new Random());
-            }
-        }
+        private readonly Random random = new Random();
 
         public StatsdPipe(string host, int port)
         {
             udpClient = new UdpClient(host, port);
-        }
-        
-        public bool Gauge(string key, int value)
-        {
-            return Gauge(key, value, 1.0);
-        }
-
-        public bool Gauge(string key, int value, double sampleRate)
-        {
-            return Send(sampleRate, String.Format("{0}:{1:d}|g", key, value));
         }
 
         public bool Timing(string key, int value)
@@ -111,7 +91,7 @@ namespace Statsd
             {
                 foreach (var stat in stats)
                 {
-                    if (Random.NextDouble() <= sampleRate)
+                    if (random.NextDouble() <= sampleRate)
                     {
                         var statFormatted = String.Format("{0}|@{1:f}", stat, sampleRate);
                         if (DoSend(statFormatted))
