@@ -37,12 +37,18 @@ config.configFile(process.argv[2], function (config, oldConfig) {
     }, config.debugInterval || 10000);
   }
 
-  var stat_suffix = ''
+  var stat_suffix = '';
   if (config.hostname && (config.append_hostname || false)) {
       stat_suffix = '.' + config.hostname;
       if (config.debug) {
-          util.log("Using hostname as suffix: " + stat_suffix)
+          util.log("Using hostname as suffix: " + stat_suffix);
       }
+  }
+
+  // grab rootDir graphite directory from config or default to 'stats'
+  var rootDir = config.rootDir || 'stats';
+  if (config.debug) {
+      util.log("Using root directory: " + rootDir);
   }
 
 
@@ -207,8 +213,8 @@ config.configFile(process.argv[2], function (config, oldConfig) {
         var value = counters[key];
         var valuePerSecond = value / (flushInterval / 1000); // calculate "per second" rate
 
-        statString += 'stats.'        + key + stat_suffix + ' ' + valuePerSecond + ' ' + ts + "\n";
-        statString += 'stats_counts.' + key + stat_suffix + ' ' + value          + ' ' + ts + "\n";
+        statString += rootDir + '.'        + key + stat_suffix + ' ' + valuePerSecond + ' ' + ts + "\n";
+        statString += rootDir + '_counts.' + key + stat_suffix + ' ' + value          + ' ' + ts + "\n";
 
         counters[key] = 0;
         numStats += 1;
@@ -247,15 +253,15 @@ config.configFile(process.argv[2], function (config, oldConfig) {
 
             var clean_pct = '' + pct;
             clean_pct.replace('.', '_');
-            message += 'stats.timers.' + key + stat_suffix + '.mean_'  + clean_pct + ' ' + mean           + ' ' + ts + "\n";
-            message += 'stats.timers.' + key + stat_suffix + '.upper_' + clean_pct + ' ' + maxAtThreshold + ' ' + ts + "\n";
+            message += rootDir + '.timers.' + key + stat_suffix + '.mean_'  + clean_pct + ' ' + mean           + ' ' + ts + "\n";
+            message += rootDir + '.timers.' + key + stat_suffix + '.upper_' + clean_pct + ' ' + maxAtThreshold + ' ' + ts + "\n";
           }
 
           timers[key] = [];
 
-          message += 'stats.timers.' + key + stat_suffix + '.upper ' + max   + ' ' + ts + "\n";
-          message += 'stats.timers.' + key + stat_suffix + '.lower ' + min   + ' ' + ts + "\n";
-          message += 'stats.timers.' + key + stat_suffix + '.count ' + count + ' ' + ts + "\n";
+          message += rootDir + '.timers.' + key + stat_suffix + '.upper ' + max   + ' ' + ts + "\n";
+          message += rootDir + '.timers.' + key + stat_suffix + '.lower ' + min   + ' ' + ts + "\n";
+          message += rootDir + '.timers.' + key + stat_suffix + '.count ' + count + ' ' + ts + "\n";
           statString += message;
 
           numStats += 1;
@@ -263,7 +269,7 @@ config.configFile(process.argv[2], function (config, oldConfig) {
       }
 
       for (key in gauges) {
-        statString += 'stats.gauges.' + key + stat_suffix + ' ' + gauges[key] + ' ' + ts + "\n";
+        statString += rootDir + '.gauges.' + key + stat_suffix + ' ' + gauges[key] + ' ' + ts + "\n";
         numStats += 1;
       }
 

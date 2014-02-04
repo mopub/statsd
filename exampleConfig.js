@@ -30,8 +30,10 @@ Optional Variables:
     log:            location of log file for frequent keys [default: STDOUT]
     hostname:       the hostname of the current machine
                     (used in conjuction with 'append_hostname') [default: undefined]
- append_hostname:   when true, statsd will append the hostname to _all_ stats' keys
+  append_hostname:   when true, statsd will append the hostname to _all_ stats' keys
                     [default: false]
+  rootDir:         root directory for all graphite metrics
+                    [default: 'stats']
 
 */
 {
